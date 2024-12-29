@@ -1,4 +1,4 @@
-ansible_user: "{{ vault_server_username }}"
+ansible_user: "{{ vault_ansible_username }}"
 ansible_host: 10.32.40.51
 
 # --- PACKAGES -------------
