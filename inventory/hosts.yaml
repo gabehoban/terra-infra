@@ -1,0 +1,21 @@
+---
+all:
+  hosts:
+    # device-*       A network-aware device that performs a task. Does not have an OS that can be managed via SSH.
+    # host-*         A physical machine used to perform tasks. Has an OS that can be managed via SSH.
+    # vm-*           A virtual machine used to perform tasks. Has an OS that can be managed via SSH.
+    # workstation-*  A machine used directly by a person. Has an OS that can be managed via SSH.
+    host-casio: # RPI4: DNS and Time Server
+    host-sekio: # RPI4: DNS and Time Server
+    host-autio: # RPI4: Certificate Authority
+    host-rolio: # RPI4: Homebridge Server
+
+  # Groupings of servers that allow them to be administered collectively.
+  children:
+    # Hosts that utilise ansible-pull
+    ansiblepull:
+      hosts:
+        host-casio:
+        host-sekio:
+        host-autio:
+        host-rolio:

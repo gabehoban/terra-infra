@@ -1,0 +1,32 @@
+---
+- name: Ensure wifi hardware is disabled
+  ansible.builtin.lineinfile:
+    dest: "/boot/firmware/usercfg.txt"
+    line: 'dtoverlay=disable-wifi'
+    state: present
+
+- name: Ensure Bluetooth hardware is disabled
+  ansible.builtin.lineinfile:
+    dest: "/boot/firmware/usercfg.txt"
+    line: 'dtoverlay=disable-bt'
+    state: present
+
+- name: Ensure Audio hardware is disabled
+  ansible.builtin.lineinfile:
+    dest: "/boot/firmware/usercfg.txt"
+    line: 'dtparam=audio=off'
+    state: present
+
+- name: Ensure Raspi-config exists
+  ansible.builtin.apt:
+    name:
+      - raspi-config
+      - build-essential
+    state: present
+
+- name: Ensure GPIO apt packages are installed
+  ansible.builtin.apt:
+    name:
+      - python3-rpi.gpio
+      - i2c-tools
+    state: present

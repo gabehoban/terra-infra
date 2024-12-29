@@ -1,0 +1,93 @@
+---
+- name: Remove ssh service systemd-socket file
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/systemd/system/ssh.service.d/00-socket.conf
+    - /etc/systemd/system/ssh.service.requires/ssh.socket
+    - /etc/systemd/system/sockets.target.wants/ssh.socket
+
+- name: Disable systemd-socket activation
+  ansible.builtin.systemd:
+    name: ssh.socket
+    state: stopped
+    enabled: false
+    masked: true
+
+- name: Replace default 2048 bits RSA keypair
+  community.crypto.openssh_keypair:
+    state: present
+    type: rsa
+    size: "4096"
+    path: "/etc/ssh/ssh_host_rsa_key"
+    force: false
+    regenerate: partial_idempotence
+
+- name: Set hostkeys according to openssh-version
+  ansible.builtin.set_fact:
+    ssh_host_key_files:
+      - "/etc/ssh/ssh_host_rsa_key"
+      - "/etc/ssh/ssh_host_ecdsa_key"
+      - "/etc/ssh/ssh_host_ed25519_key"
+
+- name: Change host private key ownership, group and permissions
+  ansible.builtin.file:
+    path: "{{ item }}"
+    owner: "root"
+    group: "root"
+    mode: "0600"
+  loop: "{{ ssh_host_key_files }}"
+
+- name: Set macs according to openssh-version
+  ansible.builtin.set_fact:
+    ssh_macs:
+      - hmac-sha2-512-etm@openssh.com
+      - hmac-sha2-256-etm@openssh.com
+      - umac-128-etm@openssh.com
+      - hmac-sha2-512
+      - hmac-sha2-256
+
+- name: Set ciphers according to openssh-version
+  ansible.builtin.set_fact:
+    ssh_ciphers:
+      - chacha20-poly1305@openssh.com
+      - aes256-gcm@openssh.com
+      - aes128-gcm@openssh.com
+      - aes256-ctr
+      - aes192-ctr
+      - aes128-ctr
+
+- name: Set kex according to openssh-version
+  ansible.builtin.set_fact:
+    ssh_kex:
+      - sntrup761x25519-sha512@openssh.com
+      - curve25519-sha256@libssh.org
+      - diffie-hellman-group-exchange-sha256
+
+- name: Create sshd_config and set permissions to root/600
+  ansible.builtin.template:
+    src: opensshd.conf.j2
+    dest: "/etc/ssh/sshd_config"
+    mode: "0600"
+    owner: "root"
+    group: "root"
+    validate: "/usr/sbin/sshd -T -C user=root -C host=localhost -C addr=localhost -C lport=22 -f %s"
+  notify: Restart sshd
+
+- name: Check if for weak DH parameters in /etc/ssh/moduli
+  ansible.builtin.shell: awk '$5 < 2048' /etc/ssh/moduli
+  register: sshd_register_moduli
+  changed_when: false
+  check_mode: false
+
+- name: Remove all small primes # noqa no-changed-when
+  ansible.builtin.shell: >
+    awk '$5 >= 2048' /etc/ssh/moduli > /etc/ssh/moduli.new ; [ -r /etc/ssh/moduli.new
+    -a -s /etc/ssh/moduli.new ] && mv /etc/ssh/moduli.new /etc/ssh/moduli || true
+  notify: Restart sshd
+
+- name: Enable or disable sshd service
+  ansible.builtin.service:
+    name: "ssh"
+    enabled: true

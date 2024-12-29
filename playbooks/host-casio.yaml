@@ -1,0 +1,23 @@
+---
+# DNS + Time server
+
+- name: DNS + Time server
+  hosts: host-casio
+  become: true
+  pre_tasks:
+    - name: Define containers to configure
+      ansible.builtin.set_fact:
+        compositions:
+          - adguardhome
+
+  roles:
+    - role: common_bootstrap
+    - role: common_rpi_hardware
+    - role: common_security
+    - role: geerlingguy.pip
+    - role: geerlingguy.docker
+    - role: role_ansible_pull
+    - role: role_containers
+  handlers:
+    - name: Reboot host
+      ansible.builtin.reboot:

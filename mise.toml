@@ -1,7 +1,8 @@
 [env]
+ANSIBLE_VAULT_PASSWORD_FILE = '{{config_root}}/.vault_password'
 TASK_X_ENV_PRECEDENCE = 1
 TASK_X_MAP_VARIABLES = 0
 
 [tools]
-"aqua:cococonscious/koji" = "latest"
-"aqua:pre-commit/pre-commit" = "latest"
+"aqua:cococonscious/koji" = "latest"    # Conventional commit tool
+"aqua:pre-commit/pre-commit" = "latest" # Pre-commit hooks
