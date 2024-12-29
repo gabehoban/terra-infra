@@ -1,17 +1,10 @@
 ---
 - name: Ensure installation dependencies exist
   ansible.builtin.apt:
-    name:
-      - software-properties-common
+    name: software-properties-common
+    state: present
 
-- name: Add Ansible repo from PPA
-  ansible.builtin.apt_repository:
-    repo: "ppa:ansible/ansible"
-    codename: "{{ ansible_distribution_release }}"
-    update_cache: true
-
-- name: Install Ansible from Ansible repository
+- name: Install Ansible
   ansible.builtin.apt:
-    name:
-      - ansible
+    name: ansible
     state: present

@@ -28,6 +28,7 @@
       - htop
       - iptables
       - lm-sensors
+      - net-tools
       - python3
       - restic
       - smartmontools
