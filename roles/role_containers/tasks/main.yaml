@@ -1,5 +1,10 @@
 ---
 
+- name: Install required packages
+  ansible.builtin.apt:
+    name: python3-docker
+    state: present
+
 - name: Ensure composition roles are run
   ansible.builtin.include_role:
     name: "role_container_{{ item }}"

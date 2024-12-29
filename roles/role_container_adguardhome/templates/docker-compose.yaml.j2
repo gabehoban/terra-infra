@@ -11,7 +11,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.adguard.entrypoints=web"
-      - "traefik.http.routers.adguard.rule=Host(`{{ inventory_hostname.split('-')[1] }}.lab4.cc`)"
+      - "traefik.http.routers.adguard.rule=Host(`{{ ansible_hostname }}.lab4.cc`)"
       - "traefik.http.routers.adguard.tls=true"
       - "traefik.http.routers.adguard.tls.certresolver=homelabCA"
       - "traefik.http.services.adguard.loadbalancer.server.port=80"

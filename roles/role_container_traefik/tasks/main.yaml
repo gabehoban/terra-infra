@@ -1,0 +1,50 @@
+# code: language=ansible
+
+# ----------------------------
+# Core tasks
+# ----------------------------
+
+- name: "Create compose file"
+  ansible.builtin.template:
+    src: docker-compose.yaml.j2
+    dest: "{{ composition_root }}/docker-compose.yaml"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0666"
+
+- name: "Create .env file"
+  ansible.builtin.template:
+    src: environment_vars.j2
+    dest: "{{ composition_root }}/.environment_vars"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0666"
+
+# ----------------------------
+# Specific tasks
+# ----------------------------
+
+- name: "Template out config file"
+  ansible.builtin.template:
+    src: traefik-config.yaml.j2
+    dest: "{{ composition_root }}/traefik.yaml"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0666"
+
+- name: "Create HomelabCA dir"
+  ansible.builtin.file:
+    dest: "{{ composition_root }}/HomelabCA"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0700'
+
+- name: "Touch HomelabCA file"
+  ansible.builtin.copy:
+    content: ""
+    dest: "{{ composition_root }}/HomelabCA/acme.json"
+    force: false
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0600'

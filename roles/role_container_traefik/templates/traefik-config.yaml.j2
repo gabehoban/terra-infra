@@ -1,0 +1,33 @@
+log:
+    level: DEBUG
+
+api:
+    dashboard: true
+
+acme:
+    acmeLogging: true
+
+entryPoints:
+    web:
+        address: ":80"
+    http:
+        redirections:
+            entrypoint:
+                to: websecure
+                scheme: https
+    websecure:
+        address: ":443"
+
+providers:
+    docker:
+        exposedbydefault: false
+        endpoint: "unix:///var/run/docker.sock"
+
+certificatesResolvers:
+    HomelabCA:
+        acme:
+            caServer: "https://autio.lab4.cc/acme/acme/directory"
+            certificatesDuration: 24
+            email: "{{ ansible_hostname }}@lab4.cc"
+            storage: /HomelabCA/acme.json
+            tlsChallenge: true

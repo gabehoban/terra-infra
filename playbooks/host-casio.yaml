@@ -9,12 +9,12 @@
       ansible.builtin.set_fact:
         compositions:
           - adguardhome
+          - traefik
 
   roles:
     - role: common_bootstrap
     - role: common_rpi_hardware
     - role: common_security
-    - role: geerlingguy.pip
     - role: geerlingguy.docker
     - role: role_ansible_pull
     - role: role_containers
