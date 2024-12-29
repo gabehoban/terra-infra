@@ -1,19 +1,19 @@
 ---
 - name: Ensure wifi hardware is disabled
   ansible.builtin.lineinfile:
-    dest: "/boot/firmware/usercfg.txt"
+    dest: "/boot/firmware/config.txt"
     line: 'dtoverlay=disable-wifi'
     state: present
 
 - name: Ensure Bluetooth hardware is disabled
   ansible.builtin.lineinfile:
-    dest: "/boot/firmware/usercfg.txt"
+    dest: "/boot/firmware/config.txt"
     line: 'dtoverlay=disable-bt'
     state: present
 
 - name: Ensure Audio hardware is disabled
   ansible.builtin.lineinfile:
-    dest: "/boot/firmware/usercfg.txt"
+    dest: "/boot/firmware/config.txt"
     line: 'dtparam=audio=off'
     state: present
 
