@@ -1,0 +1,97 @@
+---
+- name: Install required packages
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - chrony
+    - gpsd
+    - gpsd-clients
+    - jq
+    - pps-tools
+    - setserial
+    - tcpdump
+    - util-linux-extra
+
+- name: Install PPS kernel module
+  community.general.modprobe:
+    name: pps-gpio
+    state: present
+
+- name: Stat /boot/firmware/config.txt
+  ansible.builtin.stat:
+    path: /boot/firmware/config.txt
+  register: firmware_config
+
+- name: Ensure UART is enabled
+  ansible.builtin.lineinfile:
+    dest: "/boot/firmware/config.txt"
+    line: "enable_uart=1"
+    state: present
+
+- name: Ensure UART baud rate is 115200
+  ansible.builtin.lineinfile:
+    dest: "/boot/firmware/config.txt"
+    line: "init_uart_baud=115200"
+    state: present
+
+- name: Enable miniuart-bt
+  ansible.builtin.lineinfile:
+    dest: "/boot/firmware/config.txt"
+    line: "dtoverlay=miniuart-bt"
+    state: present
+
+- name: Verify i2c is on
+  ansible.builtin.lineinfile:
+    dest: "/boot/firmware/config.txt"
+    line: "dtparam=i2c_arm=on"
+    state: present
+
+- name: Enable RTC module
+  ansible.builtin.lineinfile:
+    dest: "/boot/firmware/config.txt"
+    line: "dtoverlay=i2c-rtc,rv3028,wakeup-source,backup-switchover-mode=3"
+    state: present
+
+- name: Enable PPS module on pin 18
+  ansible.builtin.lineinfile:
+    dest: "/boot/firmware/config.txt"
+    line: "dtoverlay=pps-gpio,gpiopin=18"
+    state: present
+
+- name: Remove serial config from cmdline.txt
+  ansible.builtin.replace:
+    destfile: /boot/firmware/cmdline.txt
+    regexp: "console=serial0,115200 "
+    replace: ""
+
+- name: Stat /boot/firmware/config.txt again
+  ansible.builtin.stat:
+    path: /boot/firmware/config.txt
+  register: firmware_config_check
+
+- name: Disable conflicting services
+  ansible.builtin.systemd_service:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  loop:
+    - serial-getty@ttyAMA0.service
+
+- name: Setup udev rules for ttyAMA0 and pps0
+  ansible.builtin.blockinfile:
+    path: /etc/udev/rules.d/gps.rules
+    block: |
+      KERNEL=="pps0", OWNER="root", GROUP="_chrony", MODE="0660"
+      KERNEL=="ttyAMA0", RUN+="/bin/setserial /dev/ttyAMA0 low_latency"
+    create: true
+    owner: root
+    group: root
+    mode: "0644"
+  register: udev_rules
+
+- name: Reboot if required
+  ansible.builtin.reboot:
+  when: |
+    ( firmware_config_check.stat.checksum != firmware_config.stat.checksum ) or
+    ( udev_rules.changed )

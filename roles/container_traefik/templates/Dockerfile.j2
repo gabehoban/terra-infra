@@ -1,0 +1,5 @@
+FROM smallstep/step-cli as step
+FROM traefik:latest
+COPY --from=step /usr/local/bin/step /usr/local/bin/
+ENV CA_URL="https://autio.lab4.cc" CA_FINGERPRINT="{{ vault_ca_fingerprint }}"
+RUN step ca bootstrap --ca-url $CA_URL --fingerprint $CA_FINGERPRINT --install

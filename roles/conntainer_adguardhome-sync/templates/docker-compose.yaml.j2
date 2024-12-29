@@ -1,0 +1,12 @@
+# code: language=ansible
+name: "{{ composition_name }}"
+services:
+  SERVICENAME:
+    image: ghcr.io/bakito/adguardhome-sync:latest
+    container_name: adguardhome-sync
+    command: run
+    network_mode: host
+    env_file: .environment_vars
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped

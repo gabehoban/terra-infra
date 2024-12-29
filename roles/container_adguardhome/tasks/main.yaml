@@ -1,0 +1,67 @@
+# code: language=ansible
+
+# ----------------------------
+# Core tasks
+# ----------------------------
+
+- name: Ensure config dirs exist
+  ansible.builtin.file:
+    path: "{{ dir_item }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0775"
+  loop_control:
+    loop_var: dir_item
+  loop:
+    - "{{ composition_root }}/conf"
+    - "{{ composition_root }}/work"
+
+- name: "Create compose file"
+  ansible.builtin.template:
+    src: docker-compose.yaml.j2
+    dest: "{{ composition_root }}/docker-compose.yaml"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0666"
+
+- name: "Create .env file"
+  ansible.builtin.template:
+    src: environment_vars.j2
+    dest: "{{ composition_root }}/.environment_vars"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0666"
+
+# ----------------------------
+# Specific tasks
+# ----------------------------
+
+- name: Check if remote config exists
+  ansible.builtin.stat:
+    path: "{{ composition_root }}/conf/AdGuardHome.yaml"
+  register: stat_result
+
+- name: Get content of remote config
+  ansible.builtin.slurp:
+    src: "{{ composition_root }}/conf/AdGuardHome.yaml"
+  register: remote_config
+  when: stat_result.stat.exists
+
+- name: Interpret remote config content as yaml
+  ansible.builtin.set_fact:
+    config_yaml: "{{ remote_config.content | b64decode | from_yaml }}"
+  when: stat_result.stat.exists
+
+- name: Extract user_rules from remote config
+  ansible.builtin.set_fact:
+    container_adguardhome_user_rules: "{{ config_yaml.user_rules }}"
+  when: stat_result.stat.exists
+
+- name: "Template out config file"
+  ansible.builtin.template:
+    src: AdguardHome.yaml.j2
+    dest: "{{ composition_root }}/conf/AdGuardHome.yaml"
+    owner: "root"
+    group: "root"
+    mode: "0600"

@@ -1,0 +1,15 @@
+TZ=America/New_York
+
+LOG_LEVEL=info
+
+ORIGIN_URL=https://10.32.40.51:8080
+ORIGIN_USERNAME=sysadmin
+ORIGIN_PASSWORD="{{ vault_adguard_password }}"
+
+REPLICA1_URL=https://10.32.40.52:8080
+REPLICA1_USERNAME=sysadmin
+REPLICA1_PASSWORD="{{ vault_adguard_password }}"
+
+CRON="*/30 * * * *"
+RUN_ON_START=true
+API_PORT=0

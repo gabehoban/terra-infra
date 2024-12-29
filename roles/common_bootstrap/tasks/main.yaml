@@ -44,3 +44,15 @@
   become: true
   ansible.builtin.apt:
     autoremove: true
+
+- name: Install the step-cli package
+  ansible.builtin.apt:
+    deb: https://dl.smallstep.com/cli/docs-cli-install/latest/step-cli_arm64.deb
+
+- name: Install Homelab CA root certificate in system store
+  ansible.builtin.command: step ca bootstrap --ca-url "https://autio.lab4.cc" --fingerprint "{{ vault_ca_fingerprint }}" --install --force
+  changed_when: false
+
+- name: Update system CA trust
+  ansible.builtin.command: update-ca-certificates
+  changed_when: false

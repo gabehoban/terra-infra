@@ -18,6 +18,7 @@
     - role: geerlingguy.docker
     - role: role_ansible_pull
     - role: role_containers
+    - role: role_ntp_server
   handlers:
     - name: Reboot host
       ansible.builtin.reboot:

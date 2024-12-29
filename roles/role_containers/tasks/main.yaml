@@ -7,16 +7,16 @@
 
 - name: Ensure composition roles are run
   ansible.builtin.include_role:
-    name: "role_container_{{ item }}"
+    name: "container_{{ item }}"
   vars:
     composition_name: "{{ item }}"
     composition_root: "/opt/containers/{{ item }}"
   loop: "{{ compositions }}"
   when: compositions
 
-- name: Ensure all composition containers are started
-  community.docker.docker_compose_v2:
-    project_src: "{{ compositions_config_dir }}/{{ item }}"
-    state: present
-  loop: "{{ compositions }}"
-  when: compositions
+# - name: Ensure all composition containers are started
+#   community.docker.docker_compose_v2:
+#     project_src: "/opt/containers/{{ item }}"
+#     state: restarted
+#   loop: "{{ compositions }}"
+#   when: compositions

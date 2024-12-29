@@ -1,0 +1,16 @@
+---
+- name: Copy Chrony configuration file
+  ansible.builtin.template:
+    src: chrony.conf.j2
+    dest: /etc/chrony/chrony.conf
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Enable the Chrony service
+  ansible.builtin.systemd_service:
+    name: "{{ item }}"
+    state: restarted
+    enabled: true
+  loop:
+    - chrony

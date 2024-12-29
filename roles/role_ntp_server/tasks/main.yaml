@@ -1,0 +1,12 @@
+---
+- name: Prepare OS for Time Server
+  ansible.builtin.include_tasks:
+    file: _os.yaml
+
+- name: Configure GPSd
+  ansible.builtin.include_tasks:
+    file: _gpsd.yaml
+
+- name: Configure Chrony
+  ansible.builtin.include_tasks:
+    file: _chrony.yaml

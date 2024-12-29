@@ -6,14 +6,15 @@
 
 - name: Ensure config dirs exist
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ dir_item }}"
     state: directory
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: "0775"
+  loop_control:
+    loop_var: dir_item
   loop:
-    - "{{ composition_root }}/conf"
-    - "{{ composition_root }}/work"
+    - "{{ composition_root }}"
 
 - name: "Create compose file"
   ansible.builtin.template:

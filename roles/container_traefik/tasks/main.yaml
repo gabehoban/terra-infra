@@ -4,6 +4,22 @@
 # Core tasks
 # ----------------------------
 
+- name: Ensure dirs exist
+  ansible.builtin.file:
+    path: "{{ composition_root }}"
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0775"
+
+- name: "Create Dockerfile"
+  ansible.builtin.template:
+    src: Dockerfile.j2
+    dest: "{{ composition_root }}/Dockerfile"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0666"
+
 - name: "Create compose file"
   ansible.builtin.template:
     src: docker-compose.yaml.j2
