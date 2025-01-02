@@ -43,3 +43,17 @@ sudo hostnamectl set-hostname <hostname>
 # Full command at https://ubuntu.com/pro/dashboard
 sudo pro attach <token>
 ```
+
+8. Run the host-specific ansible playbook (verify no errors in playbook output)
+```bash
+ansible-playbook playbooks/<hostname>.yaml
+```
+
+9. Sanity check that services are running as expected
+```bash
+# For DNS servers, run a dns lookup against the host IP address
+dig @<host_ip> github.com
+
+# For NTP servers, query the server with chrony
+sudo chronyc ntpdata <host_ip>
+```
