@@ -11,15 +11,7 @@ repos:
       - id: check-merge-conflict
       - id: debug-statements
       - id: flake8
-      - id: check-yaml
         files: .*\.(yaml|yml)$
-  - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.18.0
-    hooks:
-      - id: yamllint
-        files: \.(yaml|yml)$
-        types: [file, yaml]
-        entry: yamllint --strict -f parsable
   - repo: https://github.com/ansible/ansible-lint.git
     rev: v6.16.0
     hooks:

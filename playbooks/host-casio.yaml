@@ -17,7 +17,7 @@
     - role: common_rpi_hardware
     - role: common_security
     - role: geerlingguy.docker
-    - role: role_ansible_pull
+    - role: role_node_exporter
     - role: role_containers
     - role: role_ntp_server
   handlers:

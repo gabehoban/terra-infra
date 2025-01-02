@@ -6,7 +6,7 @@ http:
   session_ttl: 720h
 users:
   - name: sysadmin
-    password: "{{ '%s' | format(vault_adguard_password) | password_hash('bcrypt', rounds=10, ident='2a')  }}"
+    password: {{ vault_adguard_hashed_password }}
 auth_attempts: 5
 block_auth_min: 15
 http_proxy: ""
@@ -14,7 +14,7 @@ language: ""
 theme: auto
 dns:
   bind_hosts:
-    - "{{ ansible_default_ipv4.address }}"
+    - {{ ansible_default_ipv4.address }}
   port: 53
   anonymize_client_ip: false
   ratelimit: 20

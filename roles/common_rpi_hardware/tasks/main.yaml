@@ -17,6 +17,12 @@
     line: 'dtparam=audio=off'
     state: present
 
+- name: Disable hz in configuration
+  ansible.builtin.lineinfile:
+    dest: "/boot/firmware/config.txt"
+    line: 'nohz=off'
+    state: present
+
 - name: Ensure Raspi-config exists
   ansible.builtin.apt:
     name:

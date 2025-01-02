@@ -20,6 +20,16 @@
     upgrade: full
     update_cache: true
 
+- name: Remove undesired packages
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: absent
+    purge: true
+  loop:
+    - modemmanager
+    - smartmontools
+    - wpasupplicant
+
 - name: Install necessary apt packages
   ansible.builtin.apt:
     name:
@@ -31,7 +41,6 @@
       - net-tools
       - python3
       - restic
-      - smartmontools
       - tmux
       - unzip
       - uptimed

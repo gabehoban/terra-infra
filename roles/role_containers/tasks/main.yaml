@@ -14,9 +14,9 @@
   loop: "{{ compositions }}"
   when: compositions
 
-# - name: Ensure all composition containers are started
-#   community.docker.docker_compose_v2:
-#     project_src: "/opt/containers/{{ item }}"
-#     state: restarted
-#   loop: "{{ compositions }}"
-#   when: compositions
+- name: Ensure all composition containers are started
+  community.docker.docker_compose_v2:
+    project_src: "/opt/containers/{{ item }}"
+    state: present
+  loop: "{{ compositions }}"
+  when: compositions

@@ -1,0 +1,11 @@
+[Unit]
+Description=NodeExporter
+
+[Service]
+TimeoutStartSec=0
+User=node_exporter
+ExecStart=/usr/local/bin/node_exporter --web.listen-address={{ ansible_default_ipv4.address }}:9100
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

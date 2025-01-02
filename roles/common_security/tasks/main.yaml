@@ -2,3 +2,7 @@
 - name: Harden SSH Service
   ansible.builtin.include_tasks:
     file: _ssh.yaml
+
+- name: Harden OS
+  ansible.builtin.include_tasks:
+    file: _os.yaml

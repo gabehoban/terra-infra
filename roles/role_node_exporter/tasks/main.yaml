@@ -1,0 +1,65 @@
+---
+- name: Check current node_exporter version.
+  ansible.builtin.command: "/usr/local/bin/node_exporter --version"
+  failed_when: false
+  changed_when: false
+  register: node_exporter_version_check
+
+- name: Configure latest version
+  ansible.builtin.include_tasks: _config-version.yaml
+  when: >
+    role_node_exporter_version is match("latest")
+    or role_node_exporter_version is not defined
+
+- name: Download and unarchive node_exporter into temporary location.
+  ansible.builtin.unarchive:
+    src: "{{ node_exporter_download_url }}"
+    dest: /tmp
+    remote_src: true
+    mode: "0755"
+  when: >
+    node_exporter_version_check.stdout is not defined
+    or role_node_exporter_version not in node_exporter_version_check.stdout
+  register: node_exporter_download_check
+
+- name: Move node_exporter binary into place.
+  ansible.builtin.copy:
+    src: "/tmp/node_exporter-{{ role_node_exporter_version }}.linux-{{ role_node_exporter_arch }}/node_exporter"
+    dest: /usr/local/bin/node_exporter
+    mode: "0755"
+    remote_src: true
+  notify: Restart node_exporter
+  when: >
+    node_exporter_download_check is changed
+    or node_exporter_version_check.stdout | length == 0
+
+- name: Create node_exporter user.
+  ansible.builtin.user:
+    name: node_exporter
+    shell: /sbin/nologin
+    state: present
+
+- name: Copy the node_exporter systemd unit file.
+  ansible.builtin.template:
+    src: node_exporter.service.j2
+    dest: /etc/systemd/system/node_exporter.service
+    mode: "0644"
+  notify:
+    - Reload Systemd Daemon
+    - Restart node_exporter
+
+- name: Ensure node_exporter is running and enabled at boot.
+  ansible.builtin.service:
+    name: node_exporter
+    state: started
+    enabled: true
+
+- name: Force all notified handlers to run at this point, not waiting for normal sync points
+  ansible.builtin.meta: flush_handlers
+
+- name: Verify node_exporter is responding to requests.
+  ansible.builtin.uri:
+    url: "http://{{ ansible_default_ipv4.address }}:9100/"
+    return_content: true
+  register: metrics_output
+  failed_when: "'Metrics' not in metrics_output.content"

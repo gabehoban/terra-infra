@@ -65,3 +65,15 @@
     owner: "root"
     group: "root"
     mode: "0600"
+  register: config_file
+
+- name: Check if conntainer is running
+  community.docker.docker_container_info:
+    name: "{{ composition_name }}"
+  register: result
+
+- name: Restart on configuration change
+  community.docker.docker_compose_v2:
+    project_src: "/opt/containers/{{ composition_name }}"
+    state: restarted
+  when: result.exists and config_file.changed

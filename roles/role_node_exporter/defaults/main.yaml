@@ -1,0 +1,4 @@
+---
+# Use the latest node_exporter release
+role_node_exporter_version: 'latest'
+role_node_exporter_arch: 'arm64'

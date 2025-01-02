@@ -1,9 +1,0 @@
----
-role_ansible_pull_present: true
-role_ansible_pull_cron_minute: "0"
-role_ansible_pull_cron_hour: "5,17"
-role_ansible_pull_workdir: "{{ ansible_path }}"
-role_ansible_pull_install_pull_cron: true
-role_ansible_pull_password_file: "{{ ansible_vault_password_file }}"
-role_ansible_pull_repo_url: https://github.com/gabehoban/terra-infra
-role_ansible_pull_playbook: "{{ ansible_hostname }}"

@@ -47,6 +47,7 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: "0666"
+  register: config_file
 
 - name: "Create HomelabCA dir"
   ansible.builtin.file:
@@ -64,3 +65,14 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: '0600'
+
+- name: Check if conntainer is running
+  community.docker.docker_container_info:
+    name: "{{ composition_name }}"
+  register: result
+
+- name: Restart on configuration change
+  community.docker.docker_compose_v2:
+    project_src: "/opt/containers/{{ composition_name }}"
+    state: restarted
+  when: result.exists and config_file.changed
